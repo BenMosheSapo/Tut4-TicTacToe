@@ -11,6 +11,7 @@ public:
 	void print();
 	void reset();
 	string over();
+	void SetRowCol(int row, int col, char x);
 	~TicTacToe();
 };
 

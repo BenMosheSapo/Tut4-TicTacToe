@@ -3,6 +3,7 @@
 #include <string.h>
 #include <iostream>
 
+using namespace std;
 TicTacToe::TicTacToe()
 {
 	reset();
@@ -12,7 +13,7 @@ TicTacToe::TicTacToe()
 //It checks if that entry of the matrix is empty
 bool TicTacToe:: move(int row, int col){
 	if (Board[row][col]== NULL){
-		if (row <= 3 && row >= 1 && col <= 3 && col >= 1){
+		if (row <= 2 && row >= 0 && col <= 2 && col >= 0){
 			return true;
 		}
 	}
@@ -43,13 +44,13 @@ void TicTacToe::reset(){
 string TicTacToe::over(){
 	int i;
 	int j;
-	char winner;
+	char winner=NULL;
 	for (i = 0; i < 3; i++){
 		if (Board[i][0] == Board[i][1] && Board[i][0] == Board[i][2]){	//Checks if one of the players has fulled up a row
 			if (Board[i][0]!=NULL)
 			winner = Board[i][0];
 		}
-
+		
 		if (Board[0][i] == Board[1][i] && Board[0][i] == Board[2][i]){	//Checks if one of the players has fulled up a column
 			if (Board[0][i] != NULL)
 			winner = Board[0][i];
@@ -60,15 +61,14 @@ string TicTacToe::over(){
 		if (Board[0][0] != NULL)
 		winner = Board[0][0];
 	}
-
+	
 	if (Board[0][2] == Board[1][1] && Board[2][0]){		//Checks if player fulled up the diagonal from top right to bottom left 
 		if (Board[0][2] != NULL)
 		winner = Board[0][2];
 	}
-
-	if (winner == 'x')
+	if (winner == 'X')
 		return "Player 1 wins";
-	else if (winner == 'o')
+	else if (winner == 'O')
 		return "Player 2 wins";
 
 	// If there is no winner yet
@@ -78,19 +78,59 @@ string TicTacToe::over(){
 		for (j = 0; j < 3; j++){
 			if (move(i, j))
 				return "Game is still in progress";
-
 		}
 	}
 
 	return "Game is a draw";
 }
+void TicTacToe::SetRowCol(int row, int col, char x) {
+	Board[row][col] = x;
+}
 TicTacToe::~TicTacToe()
 {
 }
 
+
 int main(){
 	TicTacToe game;
-	bool flag;
-	game.print();
-	cout << game.over()<<endl;
+	bool StillPlaying=true;
+	string status; //
+	char NewGame;
+	int row, col;
+	int Player = 1; //This stores who's turn it is
+	while (StillPlaying) {
+		cout << "Current Board" << endl << endl;
+		game.print(); //Prints out board
+		cout << endl << "Player " << Player << " please enter the row and column of your move (row:col)" << endl;
+		cin >> row;
+		cin.ignore(1, ':') >> col;
+		row -= 1; //The user will enter a 1 for the first row or column but in the array this corresponds to position 0
+		col -= 1;
+		if (game.move(row, col)) {	//If it's a legal move, then set it
+			if (Player == 1) {
+				game.SetRowCol(row, col, 'X');
+				Player = 2;		//Once move Done then next Player's turn
+			}
+			else {
+				game.SetRowCol(row, col, 'O');
+				Player = 1;
+			}
+		}
+		else {	//If not legal move then Player must re-enter a move. This is done by restarting loop.
+			cout << "That is not a legal move" << endl<<endl;
+		}
+		status = game.over();
+		if (status != "Game is still in progress") {
+			game.print();
+			cout << status << endl<<endl; //Prints out who won or if it was a draw
+			cout << "Would you like to play again? (Y/N)";
+			cin >> NewGame;
+			if (NewGame == 'Y' || NewGame == 'y') { // If do want to play again then resets board and it makes it Player 1's turn
+				game.reset();
+				Player = 1;
+			}	
+			else
+				return 0;
+		}
+	}
 }
